@@ -1,24 +1,34 @@
 services:
   app:
     image: spliit2:latest
+    container_name: spliit2
     ports:
       - 3000:3000
+    networks:
+      - dockernet
     env_file:
-      - container.env
+      - stack.env
     depends_on:
       db:
         condition: service_healthy
 
   db:
     image: postgres:latest
+    container_name: postgres-spliit2
     ports:
       - 5432:5432
+    networks:
+      - dockernet
     env_file:
-      - container.env
+      - stack.env
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - "/share/Container/postgres-spliit2:/var/lib/postgresql/data"
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
+networks:
+  dockernet:
+    name: dockernet
+    external: true
